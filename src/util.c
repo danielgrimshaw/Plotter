@@ -1,3 +1,26 @@
+/*
+ * util.c
+ * 
+ * Copyright 2015  <Daniel Grimshaw>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ * 
+ * 
+ */
+
 #if defined(__unix__) || defined(unix)
 #include <time.h>
 #include <sys/time.h>
@@ -54,7 +77,7 @@ unsigned int setup_shader(const char * vertex_fname,
 	rewind(buffer);
 	
 	src_buf = malloc(size * (sizeof(char)));
-	fread(src_buffer, sizeof(char), size, buffer);
+	fread(src_buf, sizeof(char), size, buffer);
 	fclose(buffer);
 
 	vsdr = glCreateShader(GL_VERTEX_SHADER); // Create a vertex shader
@@ -75,7 +98,7 @@ unsigned int setup_shader(const char * vertex_fname,
 			}
 			glGetShaderInfoLog(vsdr, info_len, 0, info_log); // Get info log
 			fprintf(stderr, "Vertex shader compilation failed: %s\n", info_log);
-			free(info_log)
+			free(info_log);
 		}
 		else { // There is no info log?
 			fprintf(stderr, "Vertex shader compilation failed");
@@ -91,7 +114,7 @@ unsigned int setup_shader(const char * vertex_fname,
 	rewind(buffer);
 	
 	src_buf = malloc(size * (sizeof(char)));
-	fread(src_buffer, sizeof(char), size, buffer);
+	fread(src_buf, sizeof(char), size, buffer);
 	fclose(buffer);
 
 	fsdr = glCreateShader(GL_FRAGMENT_SHADER); // Create a vertex shader
@@ -102,7 +125,7 @@ unsigned int setup_shader(const char * vertex_fname,
 	glGetShaderiv(fsdr, GL_COMPILE_STATUS, &success); // Did it work?
 	if (!success) {
 		int info_len; // No.
-		char *info_log;
+		char * info_log;
 
 		glGetShaderiv(fsdr, GL_INFO_LOG_LENGTH, &info_len); // Read size of log
 		if (info_len > 0) {
@@ -112,7 +135,7 @@ unsigned int setup_shader(const char * vertex_fname,
 			}
 			glGetShaderInfoLog(fsdr, info_len, 0, info_log); // Get info log
 			fprintf(stderr, "Fragment shader compilation failed: %s\n", info_log);
-			free(info_log)
+			free(info_log);
 		}
 		else { // There is no info log?
 			fprintf(stderr, "Fragment shader compilation failed");
@@ -127,17 +150,17 @@ unsigned int setup_shader(const char * vertex_fname,
 	glGetProgramiv(prog, GL_LINK_STATUS, &linked); // Did it work?
 	if (!linked) {
 		int info_len; // no
-		char *info_log;
+		char * info_log;
 
-		glGetShaderiv(sdr, GL_INFO_LOG_LENGTH, &info_len); // Get info log size
+		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &info_len); // Get info log size
 		if (info_len > 0) {
-			if (!(info_log = new char[info_len + 1])) { // User needs more RAM
+			if (!(info_log = malloc((info_len + 1)*(sizeof(char))))) { // User needs more RAM
 				fprintf(stderr, "Unable to allocate info_log (util.cpp: line 90)\n");
 				return 0;
 			}
-			glGetShaderInfoLog(sdr, info_len, 0, info_log); // Read info log
+			glGetProgramInfoLog(prog, info_len, 0, info_log); // Read info log
 			fprintf(stderr, "Program linking failed: %s\n", info_log);
-			delete[] info_log;
+			free(info_log);
 		}
 		else { // There was no info log?
 			fprintf(stderr, "Program linking failed");
@@ -149,21 +172,21 @@ unsigned int setup_shader(const char * vertex_fname,
 	return prog; // returns the program ID
 }
 
-void set_uniform1f(unsigned int prog, const char *name, float val) { // Sets float uniforms
+void set_uniform1f(unsigned int prog, const char * name, float val) { // Sets float uniforms
 	int loc = glGetUniformLocation(prog, name);
 	if (loc != -1) {
 		glUniform1f(loc, val);
 	}
 }
 
-void set_uniform2f(unsigned int prog, const char *name, float v1, float v2) { // Sets vec2 uniforms
+void set_uniform2f(unsigned int prog, const char * name, float v1, float v2) { // Sets vec2 uniforms
 	int loc = glGetUniformLocation(prog, name);
 	if (loc != -1) {
 		glUniform2f(loc, v1, v2);
 	}
 }
 
-void set_uniform1i(unsigned int prog, const char *name, int val) { // Sets int and bool uniforms
+void set_uniform1i(unsigned int prog, const char * name, int val) { // Sets int and bool uniforms
 	int loc = glGetUniformLocation(prog, name);
 	if (loc != -1) {
 		glUniform1i(loc, val);
@@ -193,7 +216,7 @@ void set_uniform1i(unsigned int prog, const char *name, int val) { // Sets int a
 #define PACK_COLOR24(r, g, b) (((b & 0xff) << 16) | ((g & 0xff) << 8) | (r & 0xff))
 #endif
 
-void * load_image(const char *fname, unsigned long *xsz, unsigned long *ysz) { // Load a ppm image
+void * load_image(const char * fname, unsigned long * xsz, unsigned long * ysz) { // Load a ppm image
 	FILE * fp = fopen(fname, "r");
 	if (fp == NULL) { // Cannot open file
 		fprintf(stderr, "failed to open: %s\n", fname);
@@ -233,17 +256,17 @@ static int read_to_wspace(FILE * fp, char * buf, int bsize) { // Read image unti
 	*buf = 0;
 
 	while (c = fgetc(fp) && isspace(c));
-	fputc(c);
+	fputc(c, fp);
 	return count;
 }
 
-void * load_ppm(FILE * fp, unsigned long *xsz, unsigned long *ysz) { // Load P6 PPM
+void * load_ppm(FILE * fp, unsigned long * xsz, unsigned long * ysz) { // Load P6 PPM
 	char buf[64];
 	int bytes, raw;
 	unsigned int w, h, i, sz;
 	uint32_t * pixels;
 
-	rewind(fp)
+	rewind(fp);
 
 	bytes = read_to_wspace(fp, buf, 64);
 	raw = buf[1] == '6';
@@ -275,12 +298,12 @@ void * load_ppm(FILE * fp, unsigned long *xsz, unsigned long *ysz) { // Load P6 
 		return 0;
 	}
 	if (!isdigit(*buf) || atoi(buf) != 255) {
-		fprintf(stderr, "load_ppm: invalid or unsupported max value: %s\n", buf;
+		fprintf(stderr, "load_ppm: invalid or unsupported max value: %s\n", buf);
 		fclose(fp);
 		return 0;
 	}
 
-	if (!(pixels = new uint32_t[w * h])) {
+	if (!(pixels = malloc(w*h*(sizeof(uint32_t))))) {
 		fprintf(stderr, "malloc failed\n");
 		fclose(fp);
 		return 0;

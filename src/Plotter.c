@@ -1,7 +1,7 @@
 /*
  * Plotter.c
  * 
- * Copyright 2015  <pi@Daniel-RPi-2>
+ * Copyright 2015  <Daniel Grimshaw>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,12 +36,14 @@ void key_handler(unsigned char key, int x, int y); // Keyboard handler
 void button_handler(int bn, int state, int x, int y); // Button handler
 void mouse_handler(int x, int y); // Mouse motion handler
 
-const char * vertex_fname;
-const char * fragment_fname;
+char * vertex_fname = "Plotter_vertex_default.glsl";
+char * fragment_fname = "Plotter_vertex_default.glsl";
 const char * controls = "\t\t\tPlotter"
-"Right now its just a picture, have fun :-)"
+"Right now its just a picture, have fun :-)";
 
 int main(int argc, char ** argv) {
+	unsigned int prog; // Program ID
+	
 	//Initialize GLUT
 	glutInit(&argc, argv);
 	glutInitWindowSize(800, 600);
@@ -58,12 +60,12 @@ int main(int argc, char ** argv) {
 	// Load all library function pointers
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK) { // Doesn't run without GLEW
-        fprintf(stderr, "Failed to initialize GLEW! Aborting!\n";
+        fprintf(stderr, "Failed to initialize GLEW! Aborting!\n");
         return EXIT_FAILURE;
     } 
 
 	// load and set the shader
-	if (!(prog = setup_shader("NotMadeYet.glsl"))) {
+	if (!(prog = setup_shader((const char *)vertex_fname, (const char *)fragment_fname))) {
 		return EXIT_FAILURE;
 	}
 
@@ -73,3 +75,22 @@ int main(int argc, char ** argv) {
 	return 0;
 }
 
+void draw(void) {
+	// Redraw function
+}
+
+void idle_handler(void) {
+	// Idle handler
+}
+
+void key_handler(unsigned char key, int x, int y) {
+	// Keyboard handler
+}
+
+void button_handler(int bn, int state, int x, int y) {
+	// Button handler
+}
+
+void mouse_handler(int x, int y) {
+	// Mouse motion handler
+}
