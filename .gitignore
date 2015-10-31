@@ -1,3 +1,6 @@
 build/*
 *.cproject
 .project
+/Debug/
+
+.settings/org.eclipse.cdt.managedbuilder.core.prefs

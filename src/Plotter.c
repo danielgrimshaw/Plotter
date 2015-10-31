@@ -27,14 +27,21 @@
 #define GLEW_STATIC
 #endif
 #include <GL/glew.h>
+#include <GL/gl.h>
 #include <GL/glut.h>
 #include "util.h"
 #include "Plotter.h"
 
 GLuint vbo;
+GLint attribute_coord2d;
+GLint uniform_offset_x;
+GLint uniform_scale_x;
+
+double offset_x = 0.0;
+double scale_x = 1.0;
 char * vertex_fname = "Plotter_vertex_default.glsl";
 char * fragment_fname = "Plotter_vertex_default.glsl";
-char * data_fname = "data.csv"
+char * data_fname = "data.csv";
 const char * controls = "\t\t\tPlotter"
 "Right now its just a picture, have fun :-)";
 
@@ -43,8 +50,10 @@ int main(int argc, char ** argv) {
 	char * file_string;
 	Point * data;
 
-	file_string = read_file(data_fname);
-	data = parse_csv(file_string);
+	file_string = *(read_file((const char *)data_fname));
+
+	data = malloc(sizeof(Point) * num_points(file_string));
+	parse_csv(file_string, &data, num_points(file_string));
 
 
 	//Initialize GLUT
@@ -57,6 +66,7 @@ int main(int argc, char ** argv) {
 	glutDisplayFunc(draw);
 	glutIdleFunc(idle_handler);
 	glutKeyboardFunc(key_handler);
+	glutSpecialFunc(special_handler);
 	glutMouseFunc(button_handler);
 	glutMotionFunc(mouse_handler);
 
@@ -110,10 +120,47 @@ void key_handler(unsigned char key, int x, int y) {
 	// Keyboard handler
 }
 
+void special_handler(int key, int x, int y) {
+	// Handle the special key presses
+	switch(key) {
+		case GLUT_KEY_LEFT:
+			offset_x -= 0.1;
+			break;
+		case GLUT_KEY_RIGHT:
+			offset_x += 0.1;
+			break;
+		case GLUT_KEY_UP:
+			scale_x *= 1.5;
+			break;
+		case GLUT_KEY_DOWN:
+			scale_x /= 1.5;
+			break;
+		case GLUT_KEY_HOME:
+			offset_x = 0.0;
+			scale_x = 1.0;
+			break;
+	  }
+	  glutPostRedisplay();
+}
+
 void button_handler(int bn, int state, int x, int y) {
 	// Button handler
 }
 
 void mouse_handler(int x, int y) {
 	// Mouse motion handler
+}
+
+void parse_csv(char * csv_file_string, Point ** buffer, size_t buffer_size) {
+	// parse_csv
+	int i;
+	for (i = 0; i < (int)buffer_size; i++) {
+		buffer[i]->x = (GLfloat)0.0;
+		buffer[i]->y = (GLfloat)0.0;
+	}
+}
+
+size_t num_points(char * csv_file_string) {
+	// num_points
+	return 1;
 }

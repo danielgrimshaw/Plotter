@@ -30,12 +30,13 @@ typedef struct {
 	GLfloat y;
 } Point;
 
-Point ** parse_csv(char * data);
-int num_points(Point * data);
+void parse_csv(char * csv_file_string, Point ** buffer, size_t buffer_size);
+size_t num_points(char * csv_file_string);
 
 void draw(void); // Redraw function
 void idle_handler(void); // Idle handler
 void key_handler(unsigned char key, int x, int y); // Keyboard handler
+void special_handler(int key, int x, int y); // Special key handler
 void button_handler(int bn, int state, int x, int y); // Button handler
 void mouse_handler(int x, int y); // Mouse motion handler
 
