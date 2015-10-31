@@ -232,6 +232,26 @@ void * load_image(const char * fname, unsigned long * xsz, unsigned long * ysz) 
 	return 0;
 }
 
+char ** read_file(const char * fname) {
+	FILE * fp = fopen(fname, "r");
+	int size;
+	char * data;
+	if (fp == NULL) {
+		fprintf(stderr, "failed to open: %s\n", fname);
+		return "";
+	}
+
+	fseek(fp, 0, SEEK_END);
+	size = ftell(fp);
+	rewind(fp);
+
+	data = malloc(size * (sizeof(char)));
+	fread(data, sizeof(char), size, fp);
+	fclose(fp);
+
+	return &fp;
+}
+
 int check_ppm(FILE * fp) {
 	rewind(fp);
 	if (fgetc(fp) == 'P' && fgetc(fp) == '6') {

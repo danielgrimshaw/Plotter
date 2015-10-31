@@ -40,6 +40,5 @@ add_executable(Plotter Plotter.c util.c)
 ########################################################
 # Linking & stuff
 #########################################################
-
-  # create the program "Plotter"
-  target_link_libraries(Plotter ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
+# create the program "Plotter"
+target_link_libraries(Plotter ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
