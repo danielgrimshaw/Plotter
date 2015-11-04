@@ -70,8 +70,10 @@ unsigned int setup_shader(const char * vertex_fname,
 	FILE * buffer; // File buffer
 
 	buffer = fopen(vertex_fname, "r");
-	if (buffer == NULL)
+	if (buffer == NULL) {
+		fprintf(stderr, "Unable to read vertex shader %s!\n", vertex_fname);
 		return 0;
+	}
 	fseek(buffer, 0, SEEK_END);
 	size = ftell(buffer);
 	rewind(buffer);
@@ -107,8 +109,10 @@ unsigned int setup_shader(const char * vertex_fname,
 	}
 
 	buffer = fopen(fragment_fname, "r");
-	if (buffer == NULL)
+	if (buffer == NULL) {
+		fprintf(stderr, "Unable to find fragment shader %s!\n", fragment_fname);
 		return 0;
+	}
 	fseek(buffer, 0, SEEK_END);
 	size = ftell(buffer);
 	rewind(buffer);
@@ -232,7 +236,7 @@ void * load_image(const char * fname, unsigned long * xsz, unsigned long * ysz) 
 	return 0;
 }
 
-char ** read_file(const char * fname) {
+char * read_file(const char * fname) {
 	FILE * fp = fopen(fname, "r");
 	int size;
 	char * data;
@@ -249,7 +253,7 @@ char ** read_file(const char * fname) {
 	fread(data, sizeof(char), size, fp);
 	fclose(fp);
 
-	return &fp;
+	return data;
 }
 
 int check_ppm(FILE * fp) {

@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #ifndef GLEW_STATIC
 #define GLEW_STATIC
 #endif
@@ -40,7 +41,7 @@ GLint uniform_scale_x;
 double offset_x = 0.0;
 double scale_x = 1.0;
 char * vertex_fname = "Plotter_vertex_default.glsl";
-char * fragment_fname = "Plotter_vertex_default.glsl";
+char * fragment_fname = "Plotter_fragment_default.glsl";
 char * data_fname = "data.csv";
 const char * controls = "\t\t\tPlotter"
 "Right now its just a picture, have fun :-)";
@@ -50,10 +51,18 @@ int main(int argc, char ** argv) {
 	char * file_string;
 	Point * data;
 
-	file_string = *(read_file((const char *)data_fname));
+	//file_string = read_file((const char *)data_fname);
 
-	data = malloc(sizeof(Point) * num_points(file_string));
-	parse_csv(file_string, &data, num_points(file_string));
+	//data = malloc(sizeof(Point) * num_points(file_string));
+	//parse_csv(file_string, &data, num_points(file_string));
+	data = malloc(sizeof(Point)*2000);
+	
+	int i;
+	for(i = 0; i < 2000; i++) {
+		float x = (i - 1000.0) / 100.0;
+		data[i].x = x;
+		data[i].y = sin(x*10.0)/(1.0 + x * x);
+	}
 
 
 	//Initialize GLUT
@@ -79,6 +88,7 @@ int main(int argc, char ** argv) {
 
 	// load and set the shader
 	if (!(prog = setup_shader((const char *)vertex_fname, (const char *)fragment_fname))) {
+		fprintf(stderr, "Failed to setup shaders!\n");
 		return EXIT_FAILURE;
 	}
 
@@ -89,7 +99,9 @@ int main(int argc, char ** argv) {
 
 	printf(controls);
 	glViewport(0,0,800,600); // Tell GPU where to draw to and window size
+	printf("Entered callback loop");
 	glutMainLoop(); // Enter callback loop
+	printf("Left callback loop");
 	return 0;
 }
 
