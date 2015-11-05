@@ -64,86 +64,15 @@ unsigned int setup_shader(const char * vertex_fname,
                           const char * fragment_fname) {
 	// Loads, compiles, and tells GPU to use shaders
 	unsigned int prog, vsdr, fsdr; // OpenGL IDs
-	char * src_buf; // Code buffer
-	int success, linked; // Success flags
-	unsigned int size; // Code buffer one
-	FILE * buffer; // File buffer
-
-	buffer = fopen(vertex_fname, "r");
-	if (buffer == NULL) {
-		fprintf(stderr, "Unable to read vertex shader %s!\n", vertex_fname);
-		return 0;
-	}
-	fseek(buffer, 0, SEEK_END);
-	size = ftell(buffer);
-	rewind(buffer);
+	int linked; // Success flags
 	
-	src_buf = malloc(size * (sizeof(char)));
-	fread(src_buf, sizeof(char), size, buffer);
-	fclose(buffer);
-
-	vsdr = glCreateShader(GL_VERTEX_SHADER); // Create a vertex shader
-	glShaderSource(vsdr, 1, (const char **)&src_buf, 0); // Use src_buf as the code
-	free(src_buf);
-
-	glCompileShader(vsdr); // Compile shader
-	glGetShaderiv(vsdr, GL_COMPILE_STATUS, &success); // Did it work?
-	if (!success) {
-		int info_len; // No.
-		char *info_log;
-
-		glGetShaderiv(vsdr, GL_INFO_LOG_LENGTH, &info_len); // Read size of log
-		if (info_len > 0) {
-			if (!(info_log = malloc((info_len + 1)*(sizeof(char))))) { // User needs significantly more RAM
-				fprintf(stderr, "Unable to allocate info_log (util.c: line 73)\n");
-				return 0;
-			}
-			glGetShaderInfoLog(vsdr, info_len, 0, info_log); // Get info log
-			fprintf(stderr, "Vertex shader compilation failed: %s\n", info_log);
-			free(info_log);
-		}
-		else { // There is no info log?
-			fprintf(stderr, "Vertex shader compilation failed");
-		}
+	if ((vsdr = compile_vertex(vertex_fname)) == 0) {
+		fprintf(stderr, "Dectected error while compiling vertex shader %s!\n", vertex_fname);
 		return 0;
 	}
-
-	buffer = fopen(fragment_fname, "r");
-	if (buffer == NULL) {
-		fprintf(stderr, "Unable to find fragment shader %s!\n", fragment_fname);
-		return 0;
-	}
-	fseek(buffer, 0, SEEK_END);
-	size = ftell(buffer);
-	rewind(buffer);
 	
-	src_buf = malloc(size * (sizeof(char)));
-	fread(src_buf, sizeof(char), size, buffer);
-	fclose(buffer);
-
-	fsdr = glCreateShader(GL_FRAGMENT_SHADER); // Create a vertex shader
-	glShaderSource(fsdr, 1, (const char **)&src_buf, 0); // Use src_buf as the code
-	free(src_buf);
-
-	glCompileShader(fsdr); // Compile shader
-	glGetShaderiv(fsdr, GL_COMPILE_STATUS, &success); // Did it work?
-	if (!success) {
-		int info_len; // No.
-		char * info_log;
-
-		glGetShaderiv(fsdr, GL_INFO_LOG_LENGTH, &info_len); // Read size of log
-		if (info_len > 0) {
-			if (!(info_log = malloc((info_len + 1)*(sizeof(char))))) { // User needs significantly more RAM
-				fprintf(stderr, "Unable to allocate info_log (util.c: line 73)\n");
-				return 0;
-			}
-			glGetShaderInfoLog(fsdr, info_len, 0, info_log); // Get info log
-			fprintf(stderr, "Fragment shader compilation failed: %s\n", info_log);
-			free(info_log);
-		}
-		else { // There is no info log?
-			fprintf(stderr, "Fragment shader compilation failed");
-		}
+	if ((fsdr = compile_fragment(fragment_fname)) == 0) {
+		fprintf(stderr, "Dectected error while compiling fragment shader %s!\n", fragment_fname);
 		return 0;
 	}
 	
@@ -174,6 +103,109 @@ unsigned int setup_shader(const char * vertex_fname,
 
 	glUseProgram(prog); // Instruct the GPU to use this program
 	return prog; // returns the program ID
+}
+
+int compile_vertex(const char * vertex_fname) {
+	// Compile vertex shader and return ID
+	int vsdr, success;
+	unsigned int size;
+	char * src_buf;
+	FILE * buffer; // Vertex shader buffer
+	
+	buffer = fopen(vertex_fname, "r");
+	if (buffer == NULL) {
+		fprintf(stderr, "Unable to read vertex shader %s!\n", vertex_fname);
+		return 0;
+	}
+	fseek(buffer, 0, SEEK_END);
+	size = ftell(buffer);
+	rewind(buffer);
+	
+	src_buf = (char *)malloc(size * (sizeof(char)));
+	fread(src_buf, sizeof(char), size, buffer);
+	if (fclose(buffer) != 0) {
+		printf("Unable to close vertex shader %s!\n", vertex_fname);
+		return 0;
+	}
+
+	vsdr = glCreateShader(GL_VERTEX_SHADER); // Create a vertex shader
+	glShaderSource(vsdr, 1, (const char **)&src_buf, 0); // Use src_buf as the code
+
+	glCompileShader(vsdr); // Compile shader
+	glGetShaderiv(vsdr, GL_COMPILE_STATUS, &success); // Did it work?
+	if (!success) {
+		int info_len; // No.
+		char *info_log;
+
+		glGetShaderiv(vsdr, GL_INFO_LOG_LENGTH, &info_len); // Read size of log
+		if (info_len > 0) {
+			if (!(info_log = malloc((info_len + 1)*(sizeof(char))))) { // User needs significantly more RAM
+				fprintf(stderr, "Unable to allocate info_log (util.c: line 73)\n");
+				return 0;
+			}
+			glGetShaderInfoLog(vsdr, info_len, 0, info_log); // Get info log
+			fprintf(stderr, "Vertex shader compilation failed: %s\n", info_log);
+			free(info_log);
+		}
+		else { // There is no info log?
+			fprintf(stderr, "Vertex shader compilation failed");
+		}
+		return 0;
+	}
+	
+	return vsdr;
+}
+
+int compile_fragment(const char * fragment_fname) {
+	// Compile Fragment shader and return ID
+	int fsdr, success;
+	unsigned int size;
+	char * src_buf;
+	FILE * buffer; // Fragment shader buffer
+	
+	buffer = fopen(fragment_fname, "r");
+	if (buffer == NULL) {
+		fprintf(stderr, "Unable to find fragment shader %s!\n", fragment_fname);
+		return 0;
+	}
+	fseek(buffer, 0, SEEK_END);
+	size = ftell(buffer);
+	rewind(buffer);
+	
+	src_buf = (char *)malloc(size * (sizeof(char)));
+	fread(src_buf, sizeof(char), size, buffer);
+	if (fclose(buffer) != 0) {
+		printf("Unable to close fragment shader %s!\n", fragment_fname);
+		return 0;
+	}
+
+	fsdr = glCreateShader(GL_FRAGMENT_SHADER); // Create a vertex shader
+	glShaderSource(fsdr, 1, (const char **)&src_buf, 0); // Use src_buf as the code
+	free(src_buf);
+
+	glCompileShader(fsdr); // Compile shader
+	glGetShaderiv(fsdr, GL_COMPILE_STATUS, &success); // Did it work?
+	if (!success) {
+		int info_len; // No.
+		char * info_log;
+
+		glGetShaderiv(fsdr, GL_INFO_LOG_LENGTH, &info_len); // Read size of log
+		if (info_len > 0) {
+			if (!(info_log = malloc((info_len + 1)*(sizeof(char))))) { // User needs significantly more RAM
+				fprintf(stderr, "Unable to allocate info_log (util.c: line 73)\n");
+				return 0;
+			}
+			glGetShaderInfoLog(fsdr, info_len, 0, info_log); // Get info log
+			fprintf(stderr, "Fragment shader compilation failed: %s\n", info_log);
+			free(info_log);
+		}
+		else { // There is no info log?
+			fprintf(stderr, "Fragment shader compilation failed");
+		}
+		return 0;
+	}
+	
+	return fsdr;
 }
 
 void set_uniform1f(unsigned int prog, const char * name, float val) { // Sets float uniforms

@@ -28,6 +28,7 @@
 typedef struct {
 	GLfloat x;
 	GLfloat y;
+	GLfloat z;
 } Point;
 
 void parse_csv(char * csv_file_string, Point ** buffer, size_t buffer_size);
