@@ -121,7 +121,7 @@ int compile_vertex(const char * vertex_fname) {
 	size = ftell(buffer);
 	rewind(buffer);
 	
-	src_buf = (char *)malloc(size * (sizeof(char)));
+	src_buf = malloc(size * (sizeof(char)));
 	fread(src_buf, sizeof(char), size, buffer);
 	if (fclose(buffer) != 0) {
 		printf("Unable to close vertex shader %s!\n", vertex_fname);
@@ -172,7 +172,7 @@ int compile_fragment(const char * fragment_fname) {
 	size = ftell(buffer);
 	rewind(buffer);
 	
-	src_buf = (char *)malloc(size * (sizeof(char)));
+	src_buf = malloc(size * (sizeof(char)));
 	fread(src_buf, sizeof(char), size, buffer);
 	if (fclose(buffer) != 0) {
 		printf("Unable to close fragment shader %s!\n", fragment_fname);

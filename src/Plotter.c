@@ -39,13 +39,19 @@ GLuint vbo;
 unsigned int prog; // Program ID
 
 int data_size = 2000;
-double scale_x = 0.1;
+double scale_x = 1.0;
 double offset_x = 0.0;
+double scale_y = 1.0;
+double offset_y = 0.0;
+double scale_z = 1.0;
+double offset_z = 0.0;
+int vbo_data_size;
 char * vertex_fname = "Plotter_vertex_default.glsl";
 char * fragment_fname = "Plotter_fragment_default.glsl";
 char * data_fname = "data.csv";
-const char * controls = "\t\t\tPlotter\n"
-"Right now its just a picture, have fun :-)\n";
+const char * controls = "\t\tPlotter\n"
+"Press the left and right arrow keys to scroll\n"
+"Press the up and down arrow keys to zoom\n";
 
 int main(int argc, char ** argv) {
 	char * file_string;
@@ -56,6 +62,7 @@ int main(int argc, char ** argv) {
 	//data = malloc(sizeof(Point) * num_points(file_string));
 	//parse_csv(file_string, &data, num_points(file_string));
 	data = malloc(sizeof(Point)*data_size);
+	vbo_data_size = sizeof(Point)*data_size;
 	
 	int i;
 	for (i = 0; i < data_size; i++) {
@@ -63,10 +70,6 @@ int main(int argc, char ** argv) {
 		data[i].x = x;
 		data[i].y = sin(x*10.0)/(1.0 + x * x);
 		data[i].z = 0.0f;
-	}
-
-	for (i = 995; i < 1005; i++) {
-		printf("(%f, %f, %f)\n", data[i].x, data[i].y, data[i].z);
 	}
 
 	//Initialize GLUT
@@ -97,21 +100,20 @@ int main(int argc, char ** argv) {
 	}
 	
 	printf(controls);
-	set_uniform1f(prog, "offset_x", (GLfloat)offset_x);
-	set_uniform1f(prog, "scale_x", (GLfloat)scale_x);
+	setScalingUniforms();
 	
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
 	glBindVertexArray(vao);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-	glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vbo_data_size, data, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (GLvoid *)0);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (GLvoid *)0);
 
-	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
@@ -122,10 +124,21 @@ int main(int argc, char ** argv) {
 	return 0;
 }
 
+void setScalingUniforms() {
+	set_uniform1f(prog, "offset_x", (GLfloat)offset_x);
+	set_uniform1f(prog, "scale_x", (GLfloat)scale_x);
+	set_uniform1f(prog, "offset_y", (GLfloat)offset_y);
+	set_uniform1f(prog, "scale_y", (GLfloat)scale_y);
+	set_uniform1f(prog, "offset_z", (GLfloat)offset_z);
+	set_uniform1f(prog, "scale_z", (GLfloat)scale_z);
+}
 void draw(void) { // Redraw function
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+
 	glUseProgram(prog);
 	glBindVertexArray(vao);
-	glDrawArrays(GL_POINTS, 0, data_size);
+	glDrawArrays(GL_LINE_STRIP, 0, data_size);
 	glBindVertexArray(0);
 	glutSwapBuffers();
 }
@@ -144,30 +157,24 @@ void special_handler(int key, int x, int y) {
 	// Handle the special key presses
 	switch(key) {
 		case GLUT_KEY_LEFT:
-			printf("left\n");
 			offset_x -= 0.1;
 			break;
 		case GLUT_KEY_RIGHT:
-			printf("right\n");
 			offset_x += 0.1;
 			break;
 		case GLUT_KEY_UP:
-			printf("up\n");
 			scale_x *= 1.5;
 			break;
 		case GLUT_KEY_DOWN:
-			printf("down\n");
 			scale_x /= 1.5;
 			break;
 		case GLUT_KEY_HOME:
-			printf("home\n");
 			offset_x = 0.0;
 			scale_x = 1.0f;
 			break;
 	}
 	
-	set_uniform1f(prog, "offset_x", (GLfloat)offset_x);
-	set_uniform1f(prog, "scale_x", (GLfloat)scale_x);
+	setScalingUniforms();
 	
 	glutPostRedisplay();
 }

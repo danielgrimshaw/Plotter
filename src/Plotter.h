@@ -34,6 +34,8 @@ typedef struct {
 void parse_csv(char * csv_file_string, Point ** buffer, size_t buffer_size);
 size_t num_points(char * csv_file_string);
 
+void setScalingUniforms();
+
 void draw(void); // Redraw function
 void idle_handler(void); // Idle handler
 void key_handler(unsigned char key, int x, int y); // Keyboard handler
