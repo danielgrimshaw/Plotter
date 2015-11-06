@@ -163,14 +163,20 @@ void special_handler(int key, int x, int y) {
 			offset_x += 0.1;
 			break;
 		case GLUT_KEY_UP:
-			scale_x *= 1.5;
+			scale_x *= 1.1;
+			scale_y *= 1.1;
 			break;
 		case GLUT_KEY_DOWN:
-			scale_x /= 1.5;
+			scale_x /= 1.1;
+			scale_y /= 1.1;
 			break;
 		case GLUT_KEY_HOME:
 			offset_x = 0.0;
-			scale_x = 1.0f;
+			scale_x = 1.0;
+			offset_y = 0.0;
+			scale_y = 1.0;
+			offset_z = 0.0;
+			scale_z = 1.0;
 			break;
 	}
 	
