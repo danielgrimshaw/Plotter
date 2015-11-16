@@ -150,7 +150,13 @@ void idle_handler(void) {
 
 void key_handler(unsigned char key, int x, int y) {
 	// Keyboard handler
-	// Empty for now
+	switch(key) {
+		case 'q':
+		case 'Q':
+		case 27: // ESC key
+			exit(0);
+			break;
+	}
 }
 
 void special_handler(int key, int x, int y) {
