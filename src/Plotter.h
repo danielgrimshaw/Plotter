@@ -41,6 +41,7 @@ void idle_handler(void); // Idle handler
 void key_handler(unsigned char key, int x, int y); // Keyboard handler
 void special_handler(int key, int x, int y); // Special key handler
 void button_handler(int bn, int state, int x, int y); // Button handler
-void mouse_handler(int x, int y); // Mouse motion handler
+void mouse_handler(int x, int y); // Mouse active motion handler
+void mouse_idle_handler(int x, int y); // Mouse passive motion handler
 
 #endif /* SRC_PLOTTER_H_ */

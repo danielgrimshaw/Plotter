@@ -45,6 +45,10 @@ double scale_y = 1.0;
 double offset_y = 0.0;
 double scale_z = 1.0;
 double offset_z = 0.0;
+int prev_x = 0;
+int prev_y = 0;
+const int window_x = 800;
+const int window_y = 600;
 int vbo_data_size;
 char * vertex_fname = "Plotter_vertex_default.glsl";
 char * fragment_fname = "Plotter_fragment_default.glsl";
@@ -85,6 +89,7 @@ int main(int argc, char ** argv) {
 	glutSpecialFunc(special_handler);
 	glutMouseFunc(button_handler);
 	glutMotionFunc(mouse_handler);
+	glutPassiveMotionFunc(mouse_idle_handler);
 
 	// Load all library function pointers
     glewExperimental = GL_TRUE;
@@ -117,7 +122,7 @@ int main(int argc, char ** argv) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	glViewport(0,0,800,600); // Tell GPU where to draw to and window size
+	glViewport(0, 0, window_x, window_y); // Tell GPU where to draw to and window size
 	glutMainLoop(); // Enter callback loop
 	glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
@@ -132,6 +137,7 @@ void setScalingUniforms() {
 	set_uniform1f(prog, "offset_z", (GLfloat)offset_z);
 	set_uniform1f(prog, "scale_z", (GLfloat)scale_z);
 }
+
 void draw(void) { // Redraw function
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -194,11 +200,11 @@ void special_handler(int key, int x, int y) {
 void button_handler(int bn, int state, int x, int y) {
 	// Button handler
 	switch(bn) {
-		case 3:
+		case 3: // Scroll up
 			scale_x *= 1.1;
 			scale_y *= 1.1;
 			break;
-		case 4:
+		case 4: // Scroll down
 			scale_x /= 1.1;
 			scale_y /= 1.1;
 			break;
@@ -210,7 +216,24 @@ void button_handler(int bn, int state, int x, int y) {
 }
 
 void mouse_handler(int x, int y) {
-	// Mouse motion handler
+	// Mouse active motion handler
+	// This will be called when the mouse is moving with a button pressed
+	// otherwise known as dragged
+	offset_x += ((x - prev_x)/200.0)*(1/scale_x);
+	offset_y -= ((y - prev_y)/150.0)*(1/scale_y);
+
+	prev_x = x;
+	prev_y = y;
+
+	setScalingUniforms();
+
+	glutPostRedisplay();
+}
+
+void mouse_idle_handler(int x, int y) {
+	// Mouse idle motion handler
+	prev_x = x;
+	prev_y = y;
 }
 
 void parse_csv(char * csv_file_string, Point ** buffer, size_t buffer_size) {
