@@ -193,6 +193,20 @@ void special_handler(int key, int x, int y) {
 
 void button_handler(int bn, int state, int x, int y) {
 	// Button handler
+	switch(bn) {
+		case 3:
+			scale_x *= 1.1;
+			scale_y *= 1.1;
+			break;
+		case 4:
+			scale_x /= 1.1;
+			scale_y /= 1.1;
+			break;
+	}
+
+	setScalingUniforms();
+
+	glutPostRedisplay();
 }
 
 void mouse_handler(int x, int y) {
