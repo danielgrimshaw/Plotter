@@ -4,14 +4,9 @@ layout (location = 0) in vec3 position;
 
 out vec2 f_color;
 
-uniform float offset_x;
-uniform float scale_x;
-uniform float offset_y;
-uniform float scale_y;
-uniform float offset_z;
-uniform float scale_z;
+uniform mat4 transform;
 
 void main(void) {
-	gl_Position = vec4((position.x + offset_x) * scale_x, (position.y + offset_y) * scale_y, (position.z + offset_z) * scale_z, 1.0);
+	gl_Position = transform * vec4(position, 1.0);
 	f_color = vec2(position.xy / 2.0 + 0.5);
 }

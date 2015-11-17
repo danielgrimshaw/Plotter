@@ -29,6 +29,9 @@ void * load_image(const char * fname, unsigned long * xsz, unsigned long * ysz);
 char * read_file(const char * fname);
 
 unsigned int setup_shader(const char * vertex_fname, const char * fragment_fname); // Sets up a shader
+int compile_vertex(const char * vertex_fname);
+int compile_fragment(const char * fragment_fname);
+
 void set_uniform1f(unsigned int prog, const char * name, float val); // Set float uniforms
 void set_uniform2f(unsigned int prog, const char * name, float v1, float v2); // Set vec2 uniforms
 void set_uniform1i(unsigned int prog, const char * name, int val); // Set int and bool uniforms

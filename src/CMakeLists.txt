@@ -39,7 +39,7 @@ find_library(M_LIB m)
 #########################################################
 # Include Files
 #########################################################
-add_executable(Plotter Plotter.c util.c)
+add_executable(Plotter Plotter.cpp util.cpp)
 
 ########################################################
 # Linking & stuff

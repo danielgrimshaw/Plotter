@@ -21,16 +21,26 @@
  *
  */
 
+// Standard Libraries
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <math.h>
+
+// OpenGL
 #ifndef GLEW_STATIC
 #define GLEW_STATIC
 #endif
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glut.h>
+
+// OpenGL Mathematics
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+// Other includes
 #include "util.h"
 #include "Plotter.h"
 
@@ -39,19 +49,14 @@ GLuint vbo;
 
 unsigned int prog; // Program ID
 
-int data_size = 2000;
-double scale_x = 1.0;
-double offset_x = 0.0;
-double scale_y = 1.0;
-double offset_y = 0.0;
-double scale_z = 1.0;
-double offset_z = 0.0;
+glm::mat4 transform;
 mouse_button button;
 bool scroll_pressed = false;
 int prev_x = 0;
 int prev_y = 0;
 const int window_x = 800;
 const int window_y = 600;
+int data_size = 2000;
 int vbo_data_size;
 char * vertex_fname = "Plotter_vertex_default.glsl";
 char * fragment_fname = "Plotter_fragment_default.glsl";
@@ -65,10 +70,7 @@ int main(int argc, char ** argv) {
 	Point * data;
 
 	//file_string = read_file((const char *)data_fname);
-
-	//data = malloc(sizeof(Point) * num_points(file_string));
-	//parse_csv(file_string, &data, num_points(file_string));
-	data = malloc(sizeof(Point)*data_size);
+	data = new Point[data_size];
 	vbo_data_size = sizeof(Point)*data_size;
 	
 	int i;
@@ -108,7 +110,6 @@ int main(int argc, char ** argv) {
 	}
 	
 	printf(controls);
-	setScalingUniforms();
 	
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
@@ -132,23 +133,18 @@ int main(int argc, char ** argv) {
 	return 0;
 }
 
-void setScalingUniforms() {
-	set_uniform1f(prog, "offset_x", (GLfloat)offset_x);
-	set_uniform1f(prog, "scale_x", (GLfloat)scale_x);
-	set_uniform1f(prog, "offset_y", (GLfloat)offset_y);
-	set_uniform1f(prog, "scale_y", (GLfloat)scale_y);
-	set_uniform1f(prog, "offset_z", (GLfloat)offset_z);
-	set_uniform1f(prog, "scale_z", (GLfloat)scale_z);
-}
-
 void draw(void) { // Redraw function
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	glUseProgram(prog);
+
+	GLint transform_loc = glGetUniformLocation(prog, "transform");
+	glUniformMatrix4fv(transform_loc, 1, GL_FALSE, glm::value_ptr(transform));
 	glBindVertexArray(vao);
 	glDrawArrays(GL_LINE_STRIP, 0, data_size);
 	glBindVertexArray(0);
+
 	glutSwapBuffers();
 }
 
@@ -166,32 +162,62 @@ void key_handler(unsigned char key, int x, int y) {
 			exit(0);
 			break;
 		case 'w':
-			offset_x += 0.1;
+			transform = glm::translate(transform, glm::vec3(
+					0.1f,
+					0.0f,
+					0.0f)
+			);
 			break;
 		case 'W':
-			offset_x += 0.01;
+			transform = glm::translate(transform, glm::vec3(
+					0.01f,
+					0.0f,
+					0.0f)
+			);
 			break;
 		case 's':
-			offset_x -= 0.1;
+			transform = glm::translate(transform, glm::vec3(
+					-0.1f,
+					0.0f,
+					0.0f)
+			);
 			break;
 		case 'S':
-			offset_x -= 0.01;
+			transform = glm::translate(transform, glm::vec3(
+					-0.01f,
+					0.0f,
+					0.0f)
+			);
 			break;
 		case 'a':
-			offset_z -= 0.1;
+			transform = glm::translate(transform, glm::vec3(
+					0.0f,
+					0.0f,
+					-0.1f)
+			);
 			break;
 		case 'A':
-			offset_z -= 0.01;
+			transform = glm::translate(transform, glm::vec3(
+					0.0f,
+					0.0f,
+					-0.01f)
+			);
 			break;
 		case 'd':
-			offset_z += 0.1;
+			transform = glm::translate(transform, glm::vec3(
+					0.0f,
+					0.0f,
+					0.1f)
+			);
 			break;
 		case 'D':
-			offset_z += 0.01;
+			transform = glm::translate(transform, glm::vec3(
+					0.0f,
+					0.0f,
+					0.01f)
+			);
 			break;
 	}
-
-	setScalingUniforms();
 
 	glutPostRedisplay();
 }
@@ -200,28 +226,34 @@ void special_handler(int key, int x, int y) {
 	// Handle the special key presses
 	switch(key) {
 		case GLUT_KEY_LEFT:
-			offset_x -= 0.01;
+			transform = glm::translate(transform, glm::vec3(
+					-0.01f,
+					0.0f,
+					0.0f)
+			);
 			break;
 		case GLUT_KEY_RIGHT:
-			offset_x += 0.01;
+			transform = glm::translate(transform, glm::vec3(
+					0.01f,
+					0.0f,
+					0.0f)
+			);
 			break;
 		case GLUT_KEY_UP:
-			offset_y += 0.01;
+			transform = glm::translate(transform, glm::vec3(
+					0.0f,
+					0.01f,
+					0.0f)
+			);
 			break;
 		case GLUT_KEY_DOWN:
-			offset_y -= 0.01;
-			break;
-		case GLUT_KEY_HOME:
-			offset_x = 0.0;
-			scale_x = 1.0;
-			offset_y = 0.0;
-			scale_y = 1.0;
-			offset_z = 0.0;
-			scale_z = 1.0;
+			transform = glm::translate(transform, glm::vec3(
+					0.0f,
+					-0.01f,
+					0.0f)
+			);
 			break;
 	}
-	
-	setScalingUniforms();
 	
 	glutPostRedisplay();
 }
@@ -254,29 +286,19 @@ void button_handler(int bn, int state, int x, int y) {
 			break;
 		case 3: // Scroll up
 			if (scroll_pressed) {
-				scale_x *= 1.01;
-				scale_y *= 1.01;
-				scale_z *= 1.01;
+				transform = glm::scale(transform, glm::vec3(1.01f, 1.01f, 1.01f));
 			} else {
-				scale_x *= 1.1;
-				scale_y *= 1.1;
-				scale_z *= 1.1;
+				transform = glm::scale(transform, glm::vec3(1.1f, 1.1f, 1.1f));
 			}
 			break;
 		case 4: // Scroll down
 			if (scroll_pressed) {
-				scale_x /= 1.01;
-				scale_y /= 1.01;
-				scale_z /= 1.01;
+				transform = glm::scale(transform, glm::vec3(0.99f, 0.99f, 0.99f));
 			} else {
-				scale_x /= 1.1;
-				scale_y /= 1.1;
-				scale_z /= 1.1;
+				transform = glm::scale(transform, glm::vec3(0.9f, 0.9f, 0.9f));
 			}
 			break;
 	}
-
-	setScalingUniforms();
 
 	glutPostRedisplay();
 }
@@ -285,21 +307,30 @@ void mouse_handler(int x, int y) {
 	// Mouse active motion handler
 	// This will be called when the mouse is moving with a button pressed
 	// otherwise known as dragged
+	printf("scale_x: %f; scale_y: %f; scale_z: %f;\n", *(glm::value_ptr(transform)), *(glm::value_ptr(transform)+5), *(glm::value_ptr(transform)+10));
+
 	if (button == MOUSE_LEFT) {
-		offset_x += ((x - prev_x)/200.0)*(1/scale_x);
-		offset_y -= ((y - prev_y)/200.0)*(1/scale_y);
+		transform = glm::translate(transform, glm::vec3(
+				((x - prev_x)/200.0)*(1/ *(glm::value_ptr(transform)) ),
+				-((y - prev_y)/200.0)*(1/ *(glm::value_ptr(transform)+5) ),
+				0.0f)
+		);
 	} else if (button == MOUSE_RIGHT) {
-		offset_x += ((x - prev_x)/200.0)*(1/scale_x);
-		offset_z -= ((y - prev_y)/200.0)*(1/scale_z);
+		transform = glm::translate(transform, glm::vec3(
+				((x - prev_x)/200.0)*(1/ *(glm::value_ptr(transform)) ),
+				0.0f,
+				-((y - prev_y)/200.0)*(1/ *(glm::value_ptr(transform)+10) ))
+		);
 	} else if (button == MOUSE_MIDDLE) {
-		offset_z += ((x - prev_x)/200.0)*(1/scale_z);
-		offset_y -= ((y - prev_y)/200.0)*(1/scale_y);
+		transform = glm::translate(transform, glm::vec3(
+				0.0f,
+				-((y - prev_y)/200.0)*(1/ *(glm::value_ptr(transform)+5) ),
+				((x - prev_x)/200.0)*(1/ *(glm::value_ptr(transform)+10)))
+		);
 	}
 
 	prev_x = x;
 	prev_y = y;
-
-	setScalingUniforms();
 
 	glutPostRedisplay();
 }
