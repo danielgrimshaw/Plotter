@@ -169,18 +169,16 @@ void special_handler(int key, int x, int y) {
 	// Handle the special key presses
 	switch(key) {
 		case GLUT_KEY_LEFT:
-			offset_x -= 0.1;
+			offset_x -= 0.01;
 			break;
 		case GLUT_KEY_RIGHT:
-			offset_x += 0.1;
+			offset_x += 0.01;
 			break;
 		case GLUT_KEY_UP:
-			scale_x *= 1.1;
-			scale_y *= 1.1;
+			offset_y += 0.01;
 			break;
 		case GLUT_KEY_DOWN:
-			scale_x /= 1.1;
-			scale_y /= 1.1;
+			offset_y -= 0.01;
 			break;
 		case GLUT_KEY_HOME:
 			offset_x = 0.0;
