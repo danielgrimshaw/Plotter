@@ -46,6 +46,7 @@ double scale_y = 1.0;
 double offset_y = 0.0;
 double scale_z = 1.0;
 double offset_z = 0.0;
+mouse_button button;
 bool scroll_pressed = false;
 int prev_x = 0;
 int prev_y = 0;
@@ -229,10 +230,27 @@ void button_handler(int bn, int state, int x, int y) {
 	// Button handler
 	switch(bn) {
 		case GLUT_MIDDLE_BUTTON:
-			if (state == GLUT_DOWN)
+			if (state == GLUT_DOWN) {
 				scroll_pressed = true;
-			else
+				button = MOUSE_MIDDLE;
+			} else {
 				scroll_pressed = false;
+				button = MOUSE_NONE;
+			}
+			break;
+		case GLUT_LEFT_BUTTON:
+			if (state == GLUT_DOWN) {
+				button = MOUSE_LEFT;
+			} else {
+				button = MOUSE_NONE;
+			}
+			break;
+		case GLUT_RIGHT_BUTTON:
+			if (state == GLUT_DOWN) {
+				button = MOUSE_RIGHT;
+			} else {
+				button = MOUSE_NONE;
+			}
 			break;
 		case 3: // Scroll up
 			if (scroll_pressed) {
@@ -267,8 +285,16 @@ void mouse_handler(int x, int y) {
 	// Mouse active motion handler
 	// This will be called when the mouse is moving with a button pressed
 	// otherwise known as dragged
-	offset_x += ((x - prev_x)/200.0)*(1/scale_x);
-	offset_y -= ((y - prev_y)/150.0)*(1/scale_y);
+	if (button == MOUSE_LEFT) {
+		offset_x += ((x - prev_x)/200.0)*(1/scale_x);
+		offset_y -= ((y - prev_y)/200.0)*(1/scale_y);
+	} else if (button == MOUSE_RIGHT) {
+		offset_x += ((x - prev_x)/200.0)*(1/scale_x);
+		offset_z -= ((y - prev_y)/200.0)*(1/scale_z);
+	} else if (button == MOUSE_MIDDLE) {
+		offset_z += ((x - prev_x)/200.0)*(1/scale_z);
+		offset_y -= ((y - prev_y)/200.0)*(1/scale_y);
+	}
 
 	prev_x = x;
 	prev_y = y;

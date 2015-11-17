@@ -31,6 +31,13 @@ typedef struct {
 	GLfloat z;
 } Point;
 
+typedef enum {
+	MOUSE_LEFT,
+	MOUSE_MIDDLE,
+	MOUSE_RIGHT,
+	MOUSE_NONE,
+} mouse_button;
+
 void parse_csv(char * csv_file_string, Point ** buffer, size_t buffer_size);
 size_t num_points(char * csv_file_string);
 
