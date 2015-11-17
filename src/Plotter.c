@@ -162,7 +162,27 @@ void key_handler(unsigned char key, int x, int y) {
 		case 27: // ESC key
 			exit(0);
 			break;
+		case 'w':
+		case 'W':
+			offset_x += 0.1;
+			break;
+		case 's':
+		case 'S':
+			offset_x -= 0.1;
+			break;
+		case 'a':
+		case 'A':
+			offset_z -= 0.1;
+			break;
+		case 'd':
+		case 'D':
+			offset_z += 0.1;
+			break;
 	}
+
+	setScalingUniforms();
+
+	glutPostRedisplay();
 }
 
 void special_handler(int key, int x, int y) {
@@ -201,10 +221,12 @@ void button_handler(int bn, int state, int x, int y) {
 		case 3: // Scroll up
 			scale_x *= 1.1;
 			scale_y *= 1.1;
+			scale_z *= 1.1;
 			break;
 		case 4: // Scroll down
 			scale_x /= 1.1;
 			scale_y /= 1.1;
+			scale_z /= 1.1;
 			break;
 	}
 
