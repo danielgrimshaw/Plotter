@@ -163,20 +163,28 @@ void key_handler(unsigned char key, int x, int y) {
 			exit(0);
 			break;
 		case 'w':
-		case 'W':
 			offset_x += 0.1;
 			break;
+		case 'W':
+			offset_x += 0.01;
+			break;
 		case 's':
-		case 'S':
 			offset_x -= 0.1;
 			break;
+		case 'S':
+			offset_x -= 0.01;
+			break;
 		case 'a':
-		case 'A':
 			offset_z -= 0.1;
 			break;
+		case 'A':
+			offset_z -= 0.01;
+			break;
 		case 'd':
-		case 'D':
 			offset_z += 0.1;
+			break;
+		case 'D':
+			offset_z += 0.01;
 			break;
 	}
 
