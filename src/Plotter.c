@@ -23,6 +23,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <math.h>
 #ifndef GLEW_STATIC
 #define GLEW_STATIC
@@ -45,6 +46,7 @@ double scale_y = 1.0;
 double offset_y = 0.0;
 double scale_z = 1.0;
 double offset_z = 0.0;
+bool scroll_pressed = false;
 int prev_x = 0;
 int prev_y = 0;
 const int window_x = 800;
@@ -226,15 +228,33 @@ void special_handler(int key, int x, int y) {
 void button_handler(int bn, int state, int x, int y) {
 	// Button handler
 	switch(bn) {
+		case GLUT_MIDDLE_BUTTON:
+			if (state == GLUT_DOWN)
+				scroll_pressed = true;
+			else
+				scroll_pressed = false;
+			break;
 		case 3: // Scroll up
-			scale_x *= 1.1;
-			scale_y *= 1.1;
-			scale_z *= 1.1;
+			if (scroll_pressed) {
+				scale_x *= 1.01;
+				scale_y *= 1.01;
+				scale_z *= 1.01;
+			} else {
+				scale_x *= 1.1;
+				scale_y *= 1.1;
+				scale_z *= 1.1;
+			}
 			break;
 		case 4: // Scroll down
-			scale_x /= 1.1;
-			scale_y /= 1.1;
-			scale_z /= 1.1;
+			if (scroll_pressed) {
+				scale_x /= 1.01;
+				scale_y /= 1.01;
+				scale_z /= 1.01;
+			} else {
+				scale_x /= 1.1;
+				scale_y /= 1.1;
+				scale_z /= 1.1;
+			}
 			break;
 	}
 
