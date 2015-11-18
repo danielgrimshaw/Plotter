@@ -64,6 +64,7 @@ glm::mat4 projection; // Projection matrix (simulates perspective)
 mouse_button button;
 GLfloat yaw = -90.0f;
 GLfloat pitch = 0.0f;
+GLfloat fov = 45.0f;
 bool scroll_pressed = false;
 bool fullscreen  = true;
 int prev_x = 0;
@@ -136,7 +137,7 @@ int main(int argc, char ** argv) {
 		return EXIT_FAILURE;
 	}
 
-	projection = glm::perspective(45.0f, (float)window_x/window_y, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(fov), (float)window_x/window_y, 0.1f, 100.0f);
 	view = glm::lookAt(camera_pos, camera_target, up);
 	
 	glGenVertexArrays(1, &vao);
@@ -194,7 +195,7 @@ void resize_handler(int width, int height) {
 	window_x = width;
 	window_y = height;
 
-	projection = glm::perspective(45.0f, (float)window_x/window_y, 0.0001f, 100.0f);
+	projection = glm::perspective(glm::radians(fov), (float)window_x/window_y, 0.0001f, 100.0f);
 }
 void key_handler(unsigned char key, int x, int y) {
 	// Keyboard handler
@@ -298,22 +299,23 @@ void button_handler(int bn, int state, int x, int y) {
 			} else {
 				button = MOUSE_NONE;
 			}
-			break;/*
+			break;
 		case 3: // Scroll up
-			if (scroll_pressed) {
-				model_transform = glm::scale(model_transform, glm::vec3(1.01f, 1.01f, 1.01f));
-			} else {
-				model_transform = glm::scale(model_transform, glm::vec3(1.1f, 1.1f, 1.1f));
-			}
+			fov -= 1.0f;
 			break;
 		case 4: // Scroll down
-			if (scroll_pressed) {
-				model_transform = glm::scale(model_transform, glm::vec3(0.99f, 0.99f, 0.99f));
-			} else {
-				model_transform = glm::scale(model_transform, glm::vec3(0.9f, 0.9f, 0.9f));
-			}
-			break;*/
+			fov += 1.0f;
+			break;
 	}
+
+	if (fov < 1.0f)
+		fov = 1.0f;
+	if (fov > 179.0f)
+		fov = 179.0f;
+
+	printf("fov: %f;\n", fov);
+
+	projection = glm::perspective(glm::radians(fov), (float)window_x/window_y, 0.1f, 100.0f);
 
 	glutPostRedisplay();
 }
