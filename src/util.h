@@ -28,7 +28,8 @@ unsigned long get_msec(void); // Get system runtime
 void * load_image(const char * fname, unsigned long * xsz, unsigned long * ysz); // load ppm P6 image file
 char * read_file(const char * fname);
 
-unsigned int setup_shader(const char * vertex_fname, const char * fragment_fname); // Sets up a shader
+unsigned int setup_shader(const char * vertex_fname,
+		const char * fragment_fname); // Sets up a shader
 int compile_vertex(const char * vertex_fname);
 int compile_fragment(const char * fragment_fname);
 

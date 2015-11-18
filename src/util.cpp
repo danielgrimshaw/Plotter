@@ -46,36 +46,38 @@ void * load_ppm(FILE * fp, unsigned long *xsz, unsigned long *ysz); // Loads a P
 
 unsigned long get_msec(void) { // Returns system run time
 #if defined(__unix__) || defined(unix)
-	static struct timeval timeval, first_timeval;
+		static struct timeval timeval, first_timeval;
 
-	gettimeofday(&timeval, 0);
+		gettimeofday(&timeval, 0);
 
-	if (first_timeval.tv_sec == 0) {
-		first_timeval = timeval;
-		return 0;
-	}
-	return (timeval.tv_sec - first_timeval.tv_sec) * 1000 + (timeval.tv_usec - first_timeval.tv_usec) / 1000;
+		if (first_timeval.tv_sec == 0) {
+			first_timeval = timeval;
+			return 0;
+		}
+		return (timeval.tv_sec - first_timeval.tv_sec) * 1000 + (timeval.tv_usec - first_timeval.tv_usec) / 1000;
 #else
 	return GetTickCount();
 #endif	// __unix__
 }
 
 unsigned int setup_shader(const char * vertex_fname,
-                          const char * fragment_fname) {
+		const char * fragment_fname) {
 	// Loads, compiles, and tells GPU to use shaders
 	unsigned int prog, vsdr, fsdr; // OpenGL IDs
 	int linked; // Success flags
-	
+
 	if ((vsdr = compile_vertex(vertex_fname)) == 0) {
-		fprintf(stderr, "Dectected error while compiling vertex shader %s!\n", vertex_fname);
+		fprintf(stderr, "Dectected error while compiling vertex shader %s!\n",
+				vertex_fname);
 		return 0;
 	}
-	
+
 	if ((fsdr = compile_fragment(fragment_fname)) == 0) {
-		fprintf(stderr, "Dectected error while compiling fragment shader %s!\n", fragment_fname);
+		fprintf(stderr, "Dectected error while compiling fragment shader %s!\n",
+				fragment_fname);
 		return 0;
 	}
-	
+
 	prog = glCreateProgram(); // Allocate space on the GPU for a program
 	glAttachShader(prog, vsdr); // Program needs the compiled code
 	glAttachShader(prog, fsdr);
@@ -88,14 +90,14 @@ unsigned int setup_shader(const char * vertex_fname,
 		glGetProgramiv(prog, GL_INFO_LOG_LENGTH, &info_len); // Get info log size
 		if (info_len > 0) {
 			if (!(info_log = new char[info_len + 1])) { // User needs more RAM
-				fprintf(stderr, "Unable to allocate info_log (util.cpp: line 90)\n");
+				fprintf(stderr,
+						"Unable to allocate info_log (util.cpp: line 90)\n");
 				return 0;
 			}
 			glGetProgramInfoLog(prog, info_len, 0, info_log); // Read info log
 			fprintf(stderr, "Program linking failed: %s\n", info_log);
-			delete [] info_log;
-		}
-		else { // There was no info log?
+			delete[] info_log;
+		} else { // There was no info log?
 			fprintf(stderr, "Program linking failed");
 		}
 		return 0;
@@ -111,7 +113,7 @@ int compile_vertex(const char * vertex_fname) {
 	unsigned int size;
 	char * src_buf;
 	FILE * buffer; // Vertex shader buffer
-	
+
 	buffer = fopen(vertex_fname, "r");
 	if (buffer == NULL) {
 		fprintf(stderr, "Unable to read vertex shader %s!\n", vertex_fname);
@@ -120,7 +122,7 @@ int compile_vertex(const char * vertex_fname) {
 	fseek(buffer, 0, SEEK_END);
 	size = ftell(buffer);
 	rewind(buffer);
-	
+
 	src_buf = new char[size];
 	fread(src_buf, sizeof(char), size, buffer);
 	if (fclose(buffer) != 0) {
@@ -128,7 +130,7 @@ int compile_vertex(const char * vertex_fname) {
 		return 0;
 	}
 	vsdr = glCreateShader(GL_VERTEX_SHADER); // Create a vertex shader
-	glShaderSource(vsdr, 1, (const char **)&src_buf, 0); // Use src_buf as the code
+	glShaderSource(vsdr, 1, (const char **) &src_buf, 0); // Use src_buf as the code
 
 	glCompileShader(vsdr); // Compile shader
 	glGetShaderiv(vsdr, GL_COMPILE_STATUS, &success); // Did it work?
@@ -139,19 +141,19 @@ int compile_vertex(const char * vertex_fname) {
 		glGetShaderiv(vsdr, GL_INFO_LOG_LENGTH, &info_len); // Read size of log
 		if (info_len > 0) {
 			if (!(info_log = new char[info_len + 1])) { // User needs significantly more RAM
-				fprintf(stderr, "Unable to allocate info_log (util.c: line 73)\n");
+				fprintf(stderr,
+						"Unable to allocate info_log (util.c: line 73)\n");
 				return 0;
 			}
 			glGetShaderInfoLog(vsdr, info_len, 0, info_log); // Get info log
 			fprintf(stderr, "Vertex shader compilation failed: %s\n", info_log);
-			delete [] info_log;
-		}
-		else { // There is no info log?
+			delete[] info_log;
+		} else { // There is no info log?
 			fprintf(stderr, "Vertex shader compilation failed");
 		}
 		return 0;
 	}
-	
+
 	return vsdr;
 }
 
@@ -161,7 +163,7 @@ int compile_fragment(const char * fragment_fname) {
 	unsigned int size;
 	char * src_buf;
 	FILE * buffer; // Fragment shader buffer
-	
+
 	buffer = fopen(fragment_fname, "r");
 	if (buffer == NULL) {
 		fprintf(stderr, "Unable to find fragment shader %s!\n", fragment_fname);
@@ -170,7 +172,7 @@ int compile_fragment(const char * fragment_fname) {
 	fseek(buffer, 0, SEEK_END);
 	size = ftell(buffer);
 	rewind(buffer);
-	
+
 	src_buf = new char[size];
 	fread(src_buf, sizeof(char), size, buffer);
 	if (fclose(buffer) != 0) {
@@ -179,8 +181,8 @@ int compile_fragment(const char * fragment_fname) {
 	}
 
 	fsdr = glCreateShader(GL_FRAGMENT_SHADER); // Create a vertex shader
-	glShaderSource(fsdr, 1, (const char **)&src_buf, 0); // Use src_buf as the code
-	delete [] src_buf;
+	glShaderSource(fsdr, 1, (const char **) &src_buf, 0); // Use src_buf as the code
+	delete[] src_buf;
 
 	glCompileShader(fsdr); // Compile shader
 	glGetShaderiv(fsdr, GL_COMPILE_STATUS, &success); // Did it work?
@@ -191,19 +193,20 @@ int compile_fragment(const char * fragment_fname) {
 		glGetShaderiv(fsdr, GL_INFO_LOG_LENGTH, &info_len); // Read size of log
 		if (info_len > 0) {
 			if (!(info_log = new char[info_len + 1])) { // User needs significantly more RAM
-				fprintf(stderr, "Unable to allocate info_log (util.c: line 73)\n");
+				fprintf(stderr,
+						"Unable to allocate info_log (util.c: line 73)\n");
 				return 0;
 			}
 			glGetShaderInfoLog(fsdr, info_len, 0, info_log); // Get info log
-			fprintf(stderr, "Fragment shader compilation failed: %s\n", info_log);
-			delete [] info_log;
-		}
-		else { // There is no info log?
+			fprintf(stderr, "Fragment shader compilation failed: %s\n",
+					info_log);
+			delete[] info_log;
+		} else { // There is no info log?
 			fprintf(stderr, "Fragment shader compilation failed");
 		}
 		return 0;
 	}
-	
+
 	return fsdr;
 }
 
@@ -251,7 +254,8 @@ void set_uniform1i(unsigned int prog, const char * name, int val) { // Sets int 
 #define PACK_COLOR24(r, g, b) (((b & 0xff) << 16) | ((g & 0xff) << 8) | (r & 0xff))
 #endif
 
-void * load_image(const char * fname, unsigned long * xsz, unsigned long * ysz) { // Load a ppm image
+void * load_image(const char * fname, unsigned long * xsz,
+		unsigned long * ysz) { // Load a ppm image
 	FILE * fp = fopen(fname, "r");
 	if (fp == NULL) { // Cannot open file
 		fprintf(stderr, "failed to open: %s\n", fname);
@@ -301,16 +305,19 @@ static int read_to_wspace(FILE * fp, char * buf, int bsize) { // Read image unti
 
 	while (c = fgetc(fp) && !isspace(c) && count < bsize - 1) {
 		if (c == '#') {
-			while (c = fgetc(fp) && c != '\n' && c != '\r');
+			while (c = fgetc(fp) && c != '\n' && c != '\r')
+				;
 			c = fgetc(fp);
-			if (c == '\n' || c == '\r') continue;
+			if (c == '\n' || c == '\r')
+				continue;
 		}
 		*buf++ = c;
 		count++;
 	}
 	*buf = 0;
 
-	while (c = fgetc(fp) && isspace(c));
+	while (c = fgetc(fp) && isspace(c))
+		;
 	fputc(c, fp);
 	return count;
 }
@@ -353,12 +360,13 @@ void * load_ppm(FILE * fp, unsigned long * xsz, unsigned long * ysz) { // Load P
 		return 0;
 	}
 	if (!isdigit(*buf) || atoi(buf) != 255) {
-		fprintf(stderr, "load_ppm: invalid or unsupported max value: %s\n", buf);
+		fprintf(stderr, "load_ppm: invalid or unsupported max value: %s\n",
+				buf);
 		fclose(fp);
 		return 0;
 	}
 
-	if (!(pixels = new uint32_t[w*h])) {
+	if (!(pixels = new uint32_t[w * h])) {
 		fprintf(stderr, "Memory allocation failed\n");
 		fclose(fp);
 		return 0;
@@ -371,7 +379,7 @@ void * load_ppm(FILE * fp, unsigned long * xsz, unsigned long * ysz) { // Load P
 		int b = fgetc(fp);
 
 		if (r == -1 || g == -1 || b == -1) {
-			delete [] pixels;
+			delete[] pixels;
 			fclose(fp); // Image is corrupt
 			fprintf(stderr, "load_ppm: EOF while reading pixel data\n");
 			return 0;
@@ -381,7 +389,9 @@ void * load_ppm(FILE * fp, unsigned long * xsz, unsigned long * ysz) { // Load P
 
 	fclose(fp);
 
-	if (xsz) *xsz = w;
-	if (ysz) *ysz = h;
+	if (xsz)
+		*xsz = w;
+	if (ysz)
+		*ysz = h;
 	return pixels;
 }
