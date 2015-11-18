@@ -45,6 +45,7 @@ void setScalingUniforms();
 
 void draw(void); // Redraw function
 void idle_handler(void); // Idle handler
+void resize_handler(int width, int height); // Window resize handler
 void key_handler(unsigned char key, int x, int y); // Keyboard handler
 void special_handler(int key, int x, int y); // Special key handler
 void button_handler(int bn, int state, int x, int y); // Button handler
