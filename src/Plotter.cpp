@@ -80,6 +80,7 @@ char * data_fname = "data.csv";
 const char * controls = "\t\tPlotter\n"
 "Use WASDQE or the arrow keys to move around\n"
 "Holding shift and using WASDQE will accelerate movement\n"
+"Page Up and Page Down will also control vertical movement\n"
 "Use mouse to control camera angle like a FPS game\n"
 "Press t to toggle full-screen and see these controls\n"
 "Press Esc to close the program\n";
