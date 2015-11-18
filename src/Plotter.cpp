@@ -77,8 +77,11 @@ char * vertex_fname = "Plotter_vertex_default.glsl";
 char * fragment_fname = "Plotter_fragment_default.glsl";
 char * data_fname = "data.csv";
 const char * controls = "\t\tPlotter\n"
-"Press the left and right arrow keys to scroll\n"
-"Press the up and down arrow keys to zoom\n";
+"Use WASD or the arrow keys to move around\n"
+"Holding shift and using WASD will accelerate movement\n"
+"Use mouse to control camera angle like a FPS game\n"
+"Press t to toggle full-screen and see these controls\n"
+"Press q or Esc to close the program\n";
 
 int main(int argc, char ** argv) {
 	char * file_string;
