@@ -203,8 +203,6 @@ void key_handler(unsigned char key, int x, int y) {
 	GLfloat slow = (get_msec() - last_frame != 0 ? (get_msec() - last_frame) : 1)*0.1f;
 
 	switch(key) {
-		case 'q':
-		case 'Q':
 		case 27: // ESC key
 			exit(0);
 			break;
@@ -240,6 +238,18 @@ void key_handler(unsigned char key, int x, int y) {
 			break;
 		case 'D':
 			camera_pos += glm::normalize(glm::cross(camera_front, camera_up)) * fast;
+			break;
+		case 'q':
+			camera_pos += glm::normalize(glm::cross(camera_front, camera_right)) * slow;
+			break;
+		case 'Q':
+			camera_pos += glm::normalize(glm::cross(camera_front, camera_right)) * fast;
+			break;
+		case 'e':
+			camera_pos -= glm::normalize(glm::cross(camera_front, camera_right)) * slow;
+			break;
+		case 'E':
+			camera_pos -= glm::normalize(glm::cross(camera_front, camera_right)) * fast;
 			break;
 	}
 
