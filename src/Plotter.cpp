@@ -65,6 +65,7 @@ mouse_button button;
 GLfloat yaw = -90.0f;
 GLfloat pitch = 0.0f;
 bool scroll_pressed = false;
+bool fullscreen  = true;
 int prev_x = 0;
 int prev_y = 0;
 int window_x = 800;
@@ -202,6 +203,15 @@ void key_handler(unsigned char key, int x, int y) {
 		case 'Q':
 		case 27: // ESC key
 			exit(0);
+			break;
+		case 't':
+		case 'T':
+			glutFullScreen();
+			if (fullscreen)
+				glutReshapeWindow(800, 600);
+			else
+				glutReshapeWindow(window_x, window_y);
+			fullscreen = !fullscreen;
 			break;
 		case 'w':
 			camera_pos += slow * camera_front;
