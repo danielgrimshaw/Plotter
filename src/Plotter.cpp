@@ -277,6 +277,12 @@ void special_handler(int key, int x, int y) {
 		case GLUT_KEY_DOWN:
 			camera_pos -= slow * camera_front;
 			break;
+		case GLUT_KEY_PAGE_UP:
+			camera_pos -= glm::normalize(glm::cross(camera_front, camera_right)) * slow;
+			break;
+		case GLUT_KEY_PAGE_DOWN:
+			camera_pos += glm::normalize(glm::cross(camera_front, camera_right)) * slow;
+			break;
 	}
 	
 	view = glm::lookAt(camera_pos, camera_pos + camera_front, camera_up);
