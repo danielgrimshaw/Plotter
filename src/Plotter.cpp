@@ -95,7 +95,7 @@ int main(int argc, char ** argv) {
 	
 	int i;
 	for (i = 0; i < data_size; i++) {
-		GLfloat x = (i - 1000.0) / 100.0;
+		GLfloat x = (i - (data_size / 2.0f)) / (data_size / 20.0f);
 		data[i].x = x;
 		data[i].y = sin(x*10.0)/(1.0 + x * x);
 		data[i].z = 1.0f;
