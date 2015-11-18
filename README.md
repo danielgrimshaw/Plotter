@@ -9,7 +9,7 @@ Program to plot data from a CSV file
 ## Linux
 * Install make, cmake, libglew-dev, libgl-dev, and freeglut3-dev or equivalent packages
 * Run auto_install.sh
-* The program will be built in bin/
+* The program will be built in Plotter/bin/
 
 ## Windows
 * Install cmake
