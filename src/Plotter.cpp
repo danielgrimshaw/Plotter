@@ -96,7 +96,7 @@ int main(int argc, char ** argv) {
 		GLfloat x = (i - (data_size / 2.0f)) / (data_size / 20.0f);
 		data[i].x = x;
 		data[i].y = sin(x * 10.0) / (1.0 + x * x);
-		data[i].z = 1.0f;
+		data[i].z = x;
 	}
 
 	printf(controls);
@@ -350,8 +350,6 @@ void button_handler(int bn, int state, int x, int y) {
 		fov = 1.0f;
 	if (fov > 179.0f)
 		fov = 179.0f;
-
-	printf("fov: %f;\n", fov);
 
 	projection = glm::perspective(glm::radians(fov),
 			(float) window_x / window_y, 0.1f, 100.0f);
